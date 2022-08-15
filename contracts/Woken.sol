@@ -1,15 +1,3 @@
-/**
- *Submitted for verification at BscScan.com on 2021-09-03
-*/
-
-/*
-
-https://successinu.online
-https://t.me/SuccessInuOfficial
-BSC Token
-
-*/
-
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: Unlicensed
