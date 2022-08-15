@@ -670,11 +670,6 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external;
 }
 
-
-
-
-//    SuccessInu V3
-
 contract Woken is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
@@ -743,6 +738,8 @@ contract Woken is Context, IERC20, Ownable {
     uint256 private _previousDoGoodFee = _doGoodFee;
 
     address public marketingAndTeamFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
+    address public goodDollar = 0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B;
+    address public WETH = 0x0BE9e53fd7EDaC9F859882AfdDa116645287C629;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -1052,26 +1049,15 @@ contract Woken is Context, IERC20, Ownable {
     }
 
     function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
-        // split the contract balance into halves
-        uint256 half = contractTokenBalance.div(2);
-        uint256 otherHalf = contractTokenBalance.sub(half);
-
-        // capture the contract's current ETH balance.
-        // this is so that we can capture exactly the amount of ETH that the
-        // swap creates, and not make the liquidity event include any ETH that
-        // has been manually sent to the contract
-        uint256 initialBalance = address(this).balance;
-
         // swap tokens for ETH
-        swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
-
+        swapTokensForEth(contractTokenBalance); 
         // how much ETH did we just swap into?
-        uint256 newBalance = address(this).balance.sub(initialBalance);
+        uint256 newBalance = balanceOf(address(this));
 
-        // add liquidity to uniswap
-        addLiquidity(otherHalf, newBalance);
-
-        emit SwapAndLiquify(half, newBalance, otherHalf);
+        // buy G$
+        swapFuseForGood(newBalance);
+        
+        //emit SwapAndLiquify(half, newBalance, otherHalf);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private {
@@ -1086,6 +1072,24 @@ contract Woken is Context, IERC20, Ownable {
         uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokenAmount,
             0, // accept any amount of ETH
+            path,
+            address(this),
+            block.timestamp
+        );
+    }
+
+    function swapFuseForGood(uint256 tokenAmount) private {
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = goodDollar;
+        path[1] = uniswapV2Router.WETH(); 
+
+        _approve(goodDollar, address(uniswapV2Router), tokenAmount);
+
+        // make the swap
+        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of GoodDollar
             path,
             address(this),
             block.timestamp
@@ -1171,13 +1175,13 @@ contract Woken is Context, IERC20, Ownable {
     }
 
     function enableAllFees() external onlyOwner() {
-        _taxFee       = 1;
+        _taxFee       = 5;
         _previousTaxFee = _taxFee;
-        _burnFee      = 1;
+        _burnFee      = 0;
         _previousBurnFee = _taxFee;
-        _marketingAndTeamFee = 2;
+        _marketingAndTeamFee = 0;
         _previousMarketingAndTeamFee = _marketingAndTeamFee;
-        _doGoodFee = 1;
+        _doGoodFee = 5;
         _previousDoGoodFee = _doGoodFee;
         setSwapAndLiquifyEnabled(true);
     }
