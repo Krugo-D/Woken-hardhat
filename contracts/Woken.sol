@@ -1157,10 +1157,6 @@ contract Woken is Context, IERC20, Ownable {
         _isExcludedFromFee[account] = true;
     }
 
-    function includeInFee(address account) public onlyOwner {
-        _isExcludedFromFee[account] = false;
-    }
-
     function enableAllFees() external onlyOwner() {
         _taxFee       = 5;
         _previousTaxFee = _taxFee;
@@ -1183,10 +1179,6 @@ contract Woken is Context, IERC20, Ownable {
         _doGoodFee = 0;
         _previousDoGoodFee = _doGoodFee;
         setSwapAndLiquifyEnabled(false);
-    }
-
-    function setMarketingAndTeamWallet(address newWallet) external onlyOwner() {
-        marketingAndTeamFeeWallet = newWallet;
     }
 
     function setMaxTxAmount(uint256 maxAmountInTokensWithDecimals) external onlyOwner() {
