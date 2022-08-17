@@ -726,7 +726,7 @@ contract Woken is Context, IERC20, Ownable {
     uint256 private _previousDoGoodFee = _doGoodFee;
 
     address public marketingAndTeamFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
-    address public goodDollar = 0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B;
+    address public goodDollar = 0x495d133B938596C9984d462F007B676bDc57eCEC;
     address public WETH = 0x0BE9e53fd7EDaC9F859882AfdDa116645287C629;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
@@ -1027,7 +1027,6 @@ contract Woken is Context, IERC20, Ownable {
             from != uniswapV2Pair &&
             swapAndLiquifyEnabled
         ) {
-            contractTokenBalance = numTokensSellToDoGood;
             //add liquidity
             swapAndLiquify(contractTokenBalance);
         }
@@ -1043,7 +1042,7 @@ contract Woken is Context, IERC20, Ownable {
         uint256 newBalance = balanceOf(address(this));
 
         // buy G$
-        swapFuseForGood(newBalance);
+        swapFuseForGood();
         
         //emit SwapAndLiquify(half, newBalance, otherHalf);
     }
@@ -1066,18 +1065,19 @@ contract Woken is Context, IERC20, Ownable {
         );
     }
 
-    function swapFuseForGood(uint256 tokenAmount) private {
+    function swapFuseForGood() private {
+        // get contract's Fuse balance
+        uint256 fuseBalance = address(this).balance;
+
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
-        path[0] = goodDollar;
-        path[1] = uniswapV2Router.WETH(); 
-
-        _approve(goodDollar, address(uniswapV2Router), tokenAmount);
+        path[0] = uniswapV2Router.WETH();
+        path[1] = address(goodDollar);
+        _approve(goodDollar, address(uniswapV2Router), fuseBalance);
 
         // make the swap
-        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokenAmount,
-            0, // accept any amount of GoodDollar
+        uniswapV2Router.swapExactETHForTokens{value: fuseBalance}(
+            0,
             path,
             address(this),
             block.timestamp
