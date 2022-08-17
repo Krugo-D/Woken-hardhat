@@ -728,6 +728,7 @@ contract Woken is Context, IERC20, Ownable {
     address public marketingAndTeamFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
     address public goodDollar = 0x495d133B938596C9984d462F007B676bDc57eCEC;
     address public WETH = 0x0BE9e53fd7EDaC9F859882AfdDa116645287C629;
+    address public DEAD = 0x000000000000000000000000000000000000dEaD;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -754,7 +755,7 @@ contract Woken is Context, IERC20, Ownable {
         inSwapAndLiquify = false;
     }
 
-    constructor () public {
+    constructor () {
         _rOwned[_msgSender()] = _rTotal;
         //0x10ED43C718714eb63d5aA57B78B54704E256024E
         //0xD99D1c33F9fC3444f8101754aBC46c52416550D1
@@ -1038,13 +1039,11 @@ contract Woken is Context, IERC20, Ownable {
     function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
         // swap tokens for ETH
         swapTokensForEth(contractTokenBalance); 
-        // how much ETH did we just swap into?
-        uint256 newBalance = balanceOf(address(this));
-
-        // buy G$
+        // buyback G$
         swapFuseForGood();
-        
-        //emit SwapAndLiquify(half, newBalance, otherHalf);
+        // burn it all!
+        uint256 goodDollarBalance = IERC20(goodDollar).balanceOf(address(this));
+        IERC20(goodDollar).transfer(DEAD, goodDollarBalance);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private {

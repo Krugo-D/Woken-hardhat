@@ -7,7 +7,7 @@ async function main() {
     const woken = await Woken.deploy();
 
     const [owner, user1, user2 ] = await ethers.getSigners();
-
+ 
     // Deploy
     await woken.deployed();
     console.log("\nWoken deployed to:", woken.address);
