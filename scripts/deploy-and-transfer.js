@@ -7,6 +7,7 @@ async function main() {
     const woken = await Woken.deploy();
 
     const [owner, user1, user2 ] = await ethers.getSigners();
+    const deadAddress = '0x000000000000000000000000000000000000dEaD'
  
     // Deploy
     await woken.deployed();
@@ -22,8 +23,8 @@ async function main() {
     const router = await hre.ethers.getContractAt('IUniswapV2Router02', routerAddress);
 
     // approve router address to spent tokens from owner's wallet
-    const tokensToAdd = ethers.BigNumber.from("10000000000000000000000000");
-    const baseCurToAdd = ethers.utils.parseEther("5.0")
+    const tokensToAdd = ethers.BigNumber.from('10000000000000000000000000');
+    const baseCurToAdd = ethers.utils.parseEther('5.0')
     await woken.connect(owner).approve(routerAddress, tokensToAdd);
 
     // const tokenBalanceBefore = await moonSafe.balanceOf(owner.address);
@@ -94,8 +95,10 @@ async function main() {
     const goodDollar = await ethers.getContractAt("IERC20", "0x495d133B938596C9984d462F007B676bDc57eCEC");
 
     const goodDollarBalance = await goodDollar.balanceOf(woken.address)
+    const burnedGoodDollars = await goodDollar.balanceOf(deadAddress)
 
     console.log(`\nG$ balance of woken contract is: ${goodDollarBalance}`)
+    console.log(`\nG$ balance of dead address is: ${burnedGoodDollars}`)
   }
   
   main()
