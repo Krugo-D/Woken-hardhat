@@ -1,4 +1,4 @@
-# Woken - A Speculative reflections token to support the G$ ecosystem!
+# Woken - A Speculative reflections token to support the G$ ecosystem
 
 Woken ($WOKE) is a modified ERC20 that takes a fee (10%) everytime users trade it. 
 Half of these fees are automatically converted to G$ tokens using Voltage Finance liquidity pools. 
