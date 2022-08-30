@@ -1,3 +1,3 @@
 # Speculative Charity Token that uses part of its trading fees to Buy&Burn GoodDollar G$
 
-![Alt text](/Woken-hardhat/WokenToken1.0 "Optional title")
+![Alt text](https://imgur.com/a/f79DRCd "Optional title")
